@@ -1,0 +1,9 @@
+# ============================================================
+# Namespace per DesoLabs 3-Tier Application
+# ============================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: desolabs
+  labels:
+    app.kubernetes.io/part-of: desolabs

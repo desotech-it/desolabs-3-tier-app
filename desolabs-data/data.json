@@ -1,0 +1,12 @@
+[
+  {"country": "Italy", "capital": "Roma", "population": 58856847},
+  {"country": "France", "capital": "Paris", "population": 68042591},
+  {"country": "Germany", "capital": "Berlin", "population": 84607016},
+  {"country": "Spain", "capital": "Madrid", "population": 48059777},
+  {"country": "United Kingdom", "capital": "London", "population": 67736802},
+  {"country": "Poland", "capital": "Warsaw", "population": 37750000},
+  {"country": "Netherlands", "capital": "Amsterdam", "population": 17944942},
+  {"country": "Belgium", "capital": "Brussels", "population": 11697557},
+  {"country": "Switzerland", "capital": "Bern", "population": 8848753},
+  {"country": "Austria", "capital": "Vienna", "population": 9158750}
+]

@@ -1,0 +1,98 @@
+# ============================================================
+# DesoLabs Web - Frontend (porta 80)
+# ============================================================
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: desolabs-web
+  namespace: desolabs
+  labels:
+    app: desolabs-web
+    tier: frontend
+    app.kubernetes.io/part-of: desolabs
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: desolabs-web
+  namespace: desolabs
+  labels:
+    app: desolabs-web
+    tier: frontend
+    app.kubernetes.io/part-of: desolabs
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: desolabs-web
+  template:
+    metadata:
+      labels:
+        app: desolabs-web
+        tier: frontend
+    spec:
+      serviceAccountName: desolabs-web
+      containers:
+        - name: desolabs-web
+          image: r.deso.tech/desolabs/web:1.0.0
+          ports:
+            - containerPort: 80
+              name: http
+          env:
+            - name: APP_URL
+              value: "http://desolabs-app:3001"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          resources:
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: desolabs-web
+  namespace: desolabs
+  labels:
+    app: desolabs-web
+    tier: frontend
+    app.kubernetes.io/part-of: desolabs
+spec:
+  selector:
+    app: desolabs-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: http
+      name: http
+      nodePort: 30180
+  type: NodePort

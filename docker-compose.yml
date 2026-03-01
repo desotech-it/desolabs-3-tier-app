@@ -1,0 +1,40 @@
+services:
+  web:
+    build: ./desolabs-web
+    ports:
+      - "8080:80"
+    environment:
+      - APP_URL=http://app:3001
+      - POD_NAME=desolabs-web-local
+      - POD_NAMESPACE=docker-compose
+      - NODE_NAME=localhost
+      - POD_IP=172.20.0.10
+    depends_on:
+      app:
+        condition: service_started
+
+  app:
+    build: ./desolabs-app
+    environment:
+      - DATA_URL=http://data:5000
+      - POD_NAME=desolabs-app-local
+      - POD_NAMESPACE=docker-compose
+      - NODE_NAME=localhost
+      - POD_IP=172.20.0.11
+    depends_on:
+      data:
+        condition: service_started
+
+  data:
+    build: ./desolabs-data
+    environment:
+      - DB_PATH=/data/desolabs.db
+      - POD_NAME=desolabs-data-local
+      - POD_NAMESPACE=docker-compose
+      - NODE_NAME=localhost
+      - POD_IP=172.20.0.12
+    volumes:
+      - desolabs-data:/data
+
+volumes:
+  desolabs-data:

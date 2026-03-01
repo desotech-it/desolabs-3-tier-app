@@ -1,0 +1,122 @@
+# ============================================================
+# Network Policies per DesoLabs 3-Tier
+# ============================================================
+# Architettura sicura:
+#   desolabs-web -> desolabs-app:3001 -> desolabs-data:5000
+#   web NON deve poter accedere direttamente a data
+# ============================================================
+
+# --- Default deny all traffic in desolabs ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: desolabs
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+---
+# --- Web: ingress da chiunque su 80, egress solo verso app:3001 + DNS ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: desolabs-web-policy
+  namespace: desolabs
+spec:
+  podSelector:
+    matchLabels:
+      app: desolabs-web
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: desolabs-app
+      ports:
+        - protocol: TCP
+          port: 3001
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# --- App: ingress solo da web su 3001, egress solo verso data:5000 + DNS ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: desolabs-app-policy
+  namespace: desolabs
+spec:
+  podSelector:
+    matchLabels:
+      app: desolabs-app
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: desolabs-web
+      ports:
+        - protocol: TCP
+          port: 3001
+  egress:
+    - to:
+        - podSelector:
+            matchLabels:
+              app: desolabs-data
+      ports:
+        - protocol: TCP
+          port: 5000
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+---
+# --- Data: ingress solo da app su 5000, nessun egress ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: desolabs-data-policy
+  namespace: desolabs
+spec:
+  podSelector:
+    matchLabels:
+      app: desolabs-data
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: desolabs-app
+      ports:
+        - protocol: TCP
+          port: 5000
+  egress: []
