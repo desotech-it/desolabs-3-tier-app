@@ -34,7 +34,7 @@ spec:
       serviceAccountName: desolabs-web
       containers:
         - name: desolabs-web
-          image: r.deso.tech/desolabs/web:1.0.0
+          image: r.deso.tech/dsk/desolabs-web:1.0.0
           ports:
             - containerPort: 80
               name: http

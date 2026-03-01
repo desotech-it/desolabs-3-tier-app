@@ -34,7 +34,7 @@ spec:
       serviceAccountName: desolabs-app
       containers:
         - name: desolabs-app
-          image: r.deso.tech/desolabs/app:1.0.0
+          image: r.deso.tech/dsk/desolabs-app:1.0.0
           ports:
             - containerPort: 3001
               name: http

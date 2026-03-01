@@ -34,7 +34,7 @@ spec:
       serviceAccountName: desolabs-data
       containers:
         - name: desolabs-data
-          image: r.deso.tech/desolabs/data:1.0.0
+          image: r.deso.tech/dsk/desolabs-data:1.0.0
           ports:
             - containerPort: 5000
               name: http
